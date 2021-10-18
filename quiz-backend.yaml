@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aks-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aks-backend
+  template:
+    metadata:
+      labels:
+        app: aks-backend
+    spec:
+      containers:
+      - name: aks-backend
+        image: frencirama/quiz-backend:lates
+        ports:
+        - containerPort: 8080
+        env:
+        - name: TITLE
+          value: "Java Backend Deployed on (AKS)"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aks-backend
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+  selector:
+    app: aks-backend

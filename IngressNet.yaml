@@ -1,0 +1,20 @@
+piVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: IngressNet
+  namespace: NAMESPACE
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: aks-frontend.b889f6a41d0a40319647.westeurope.aksapp.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          serviceName: aks-backend
+          servicePort: 8080
+          service:
+            name: aks-frontend
+            port:
+              number: 80

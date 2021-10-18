@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aks-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aks-frontend
+  template:
+    metadata:
+      labels:
+        app: aks-frontend
+    spec:
+      containers:
+      - name: aks-frontend
+        image: frencirama/quiz-frontend_v2:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: TITLE
+          value: "Angular Frontend Deployed on (AKS)"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aks-frontend
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: aks-frontend
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-front-back
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    haproxy.org/cors-allow-methods: "*"
+    haproxy.org/cors-allow-methods: "GET"
+    haproxy.org/cors-allow-methods: "GET, POST"
+spec:
+  rules:
+  - host: aks-frontend.b889f6a41d0a40319647.westeurope.aksapp.io
+    http:
+      paths:
+      - path: /(.*)
+        backend:
+          serviceName: aks-frontend
+          servicePort: 80
+      - path: /api(.*)
+        backend:
+          serviceName: aks-backend
+          servicePort: 8080      
